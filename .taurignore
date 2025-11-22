@@ -1,0 +1,6 @@
+# Ignore database files to prevent app restart on data changes
+
+src-tauri/data/\*_
+\*\*/_.db
+**/\*.db-shm
+**/\*.db-wal

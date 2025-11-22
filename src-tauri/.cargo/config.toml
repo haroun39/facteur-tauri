@@ -1,0 +1,12 @@
+[build]
+
+[watch]
+# Ignore database files and data directory to prevent unnecessary recompiles
+ignore = [
+    "data/**",
+    "**/*.db",
+    "**/*.db-shm",
+    "**/*.db-wal",
+    "**/data/**",
+    "**/**/*.db"
+]
