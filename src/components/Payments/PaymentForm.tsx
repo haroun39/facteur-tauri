@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Payment} from "../../types";
+import { Payment } from "../../types";
 import InputSearch2 from "../ui/input-search-2";
 import { getAllDebts } from "@/main";
 
 interface Props {
   payment?: Payment;
-  onSave: (payment: Payment) => void;
+  onSave: (payment: Payment) => Promise<void>;
   onCancel: () => void;
 }
 
@@ -18,6 +18,7 @@ const PaymentForm: React.FC<Props> = ({ payment, onSave, onCancel }) => {
   >([]);
   const [formData, setFormData] = useState<Payment>(
     payment || {
+      payment_number: "",
       customer_id: 0,
       invoice_id: undefined,
       amount: 0,
@@ -26,29 +27,38 @@ const PaymentForm: React.FC<Props> = ({ payment, onSave, onCancel }) => {
     }
   );
 
+  const generatePaymentNumber = () => {
+    const timestamp = Date.now();
+    setFormData((prev) => ({
+      ...prev,
+      payment_number: `PAY-${timestamp}`,
+    }));
+  };
 
   useEffect(() => {
     if (payment) {
       setFormData(payment);
+    } else {
+      generatePaymentNumber();
     }
   }, [payment]);
 
-  
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.customer_id == 0) {
       setErrors([{ field: "customer_id", message: "الرجاء اختيار عميل" }]);
       return;
     }
-    onSave(formData);
+    await onSave(formData);
     setFormData({
+      payment_number: "",
       customer_id: 0,
       invoice_id: undefined,
       amount: 0,
       date: formData.date,
       notes: "",
     });
+    generatePaymentNumber();
     setSearchTerm("");
     // focus on customer input
     document.getElementById("customer_id")?.focus();
@@ -76,7 +86,21 @@ const PaymentForm: React.FC<Props> = ({ payment, onSave, onCancel }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            رقم الدفعة *
+          </label>
+          <input
+            type="text"
+            name="payment_number"
+            value={formData.payment_number}
+            onChange={handleChange}
+            required
+            className="input-field"
+          />
+        </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             العميل *

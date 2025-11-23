@@ -46,6 +46,7 @@ export interface Product {
 // تعريفات الأنواع للمدفوعات
 export interface Payment {
   id?: number;
+  payment_number?: string;
   customer_id: number;
   customer_name?: string;
   invoice_id?: number;
@@ -96,8 +97,8 @@ export interface Transaction {
 }
 
 export interface TransactionsReport {
-  data: Transaction[];        // جميع المعاملات (فواتير ومدفوعات)
-  total_invoices: number;     // مجموع الفواتير في الفترة
-  total_payments: number;     // مجموع المدفوعات في الفترة
-  remaining_total: number;    // المتبقي (الفواتير - المدفوعات)
+  data: Transaction[]; // جميع المعاملات (فواتير ومدفوعات)
+  total_invoices: number; // مجموع الفواتير في الفترة
+  total_payments: number; // مجموع المدفوعات في الفترة
+  remaining_total: number; // المتبقي (الفواتير - المدفوعات)
 }

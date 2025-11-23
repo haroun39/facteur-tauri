@@ -87,6 +87,7 @@ pub struct Product {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Payment {
     pub id: Option<i32>,
+    pub payment_number: String,
     pub customer_id: i32,
     pub customer_name: Option<String>,
     pub invoice_id: Option<i32>,

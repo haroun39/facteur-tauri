@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS invoice_items (
 
 CREATE TABLE IF NOT EXISTS payments (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
+  payment_number TEXT UNIQUE NOT NULL,
   customer_id INTEGER NOT NULL,
   invoice_id INTEGER,
   amount REAL NOT NULL,

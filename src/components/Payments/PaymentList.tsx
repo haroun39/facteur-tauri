@@ -52,6 +52,7 @@ const PaymentList: React.FC<Props> = ({
         <>
           <Table>
             <TableHeader className="bg-gray-50">
+              <TableHead>رقم الدفعة</TableHead>
               <TableHead>العميل</TableHead>
               <TableHead>الفاتورة</TableHead>
               <TableHead>المبلغ</TableHead>
@@ -63,6 +64,9 @@ const PaymentList: React.FC<Props> = ({
               {payments.map((payment) => (
                 <TableRow key={payment.id} className="hover:bg-gray-50">
                   <TableCell className="text-sm font-medium text-gray-900">
+                    {payment?.payment_number}
+                  </TableCell>
+                  <TableCell className="text-sm text-gray-500">
                     {payment.customer_name}
                   </TableCell>
                   <TableCell className="text-sm text-gray-500">

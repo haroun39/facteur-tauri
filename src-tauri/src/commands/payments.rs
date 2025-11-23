@@ -62,7 +62,8 @@ pub fn get_all_payments(
         SELECT 
           p.id, p.customer_id, p.invoice_id, p.amount, p.date, p.notes, p.created_at,
           c.name AS customer_name,
-          i.invoice_number
+          i.invoice_number,
+          p.payment_number
         FROM payments p
         LEFT JOIN customers c ON p.customer_id = c.id
         LEFT JOIN invoices i ON p.invoice_id = i.id
@@ -87,6 +88,7 @@ pub fn get_all_payments(
                 created_at: r.get(6)?,
                 customer_name: r.get(7)?,
                 invoice_number: r.get(8)?,
+                payment_number: r.get(9)?,
             })
         })
         .map_err(|e| e.to_string())?
@@ -104,6 +106,7 @@ pub fn get_all_payments(
                 created_at: r.get(6)?,
                 customer_name: r.get(7)?,
                 invoice_number: r.get(8)?,
+                payment_number: r.get(9)?,
             })
         })
         .map_err(|e| e.to_string())?
@@ -126,8 +129,8 @@ pub fn create_payment(payment: Payment) -> Result<Payment, String> {
 
     db.execute(
         "
-        INSERT INTO payments (customer_id, invoice_id, amount, date, notes, created_at)
-        VALUES (?1, ?2, ?3, ?4, ?5, ?6)
+        INSERT INTO payments (customer_id, invoice_id, amount, date, notes, created_at, payment_number)
+        VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
         ",
         params![
             payment.customer_id,
@@ -135,7 +138,8 @@ pub fn create_payment(payment: Payment) -> Result<Payment, String> {
             payment.amount,
             payment.date,
             payment.notes,
-            now
+            now,
+            payment.payment_number
         ],
     )
     .map_err(|e| e.to_string())?;
@@ -163,9 +167,10 @@ pub fn update_payment(id: i64, p: Payment) -> Result<(), String> {
           amount = ?3,
           date = ?4,
           notes = ?5
-        WHERE id = ?6
+          payment_number = ?6
+        WHERE id = ?7
         ",
-        params![p.customer_id, p.invoice_id, p.amount, p.date, p.notes, id],
+        params![p.customer_id, p.invoice_id, p.amount, p.date, p.notes,p.payment_number, id],
     )
     .map_err(|e| e.to_string())?;
 

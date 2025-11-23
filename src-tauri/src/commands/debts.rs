@@ -184,7 +184,7 @@ pub fn get_transactions(
         SELECT
             p.id AS record_id,
             'payment' AS type,
-            NULL AS reference,
+            p.payment_number AS reference,
             p.customer_id,
             c.name AS customer_name,
             c.phone AS customer_phone,
@@ -205,19 +205,22 @@ pub fn get_transactions(
 
     let transactions: Vec<Transaction> = if to_date.is_some() {
         let rows = stmt
-            .query_map(rusqlite::params![customer_id, &from_date, &end_date], |row| {
-                Ok(Transaction {
-                    record_id: row.get(0)?,
-                    transaction_type: row.get(1)?,
-                    reference: row.get(2)?,
-                    customer_id: row.get(3)?,
-                    customer_name: row.get(4)?,
-                    customer_phone: row.get(5)?,
-                    date: row.get(6)?,
-                    amount: row.get(7)?,
-                    created_at: row.get(8)?,
-                })
-            })
+            .query_map(
+                rusqlite::params![customer_id, &from_date, &end_date],
+                |row| {
+                    Ok(Transaction {
+                        record_id: row.get(0)?,
+                        transaction_type: row.get(1)?,
+                        reference: row.get(2)?,
+                        customer_id: row.get(3)?,
+                        customer_name: row.get(4)?,
+                        customer_phone: row.get(5)?,
+                        date: row.get(6)?,
+                        amount: row.get(7)?,
+                        created_at: row.get(8)?,
+                    })
+                },
+            )
             .map_err(|e| e.to_string())?;
         rows.filter_map(|x| x.ok()).collect()
     } else {
