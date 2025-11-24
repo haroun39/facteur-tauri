@@ -88,6 +88,7 @@ function PrintDialog(props: Props) {
           <PDFViewer
             width={"100%"}
             style={{ height: "calc(90vh - 5rem)", border: "none" }}
+            key={Math.random()}
           >
             <InvoicePDF
               data={transactions}

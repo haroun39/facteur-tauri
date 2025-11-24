@@ -152,6 +152,12 @@ export default function InvoicePDF({ invoice, items }: Props) {
             <Text style={{ direction: "rtl", fontSize: 8 }}>
               الاسم: {invoice.customer_name}
             </Text>
+            <Text style={{ direction: "rtl", fontSize: 8 }}>
+              الهاتف: {invoice.customer_phone}
+            </Text>
+            <Text style={{ direction: "rtl", fontSize: 8 }}>
+              العنوان: {invoice.customer_address}
+            </Text>
           </View>
 
           {/* Invoice */}
@@ -179,7 +185,7 @@ export default function InvoicePDF({ invoice, items }: Props) {
             </View>
 
             {items.map((item, index) => (
-              <View style={styles.tableRow} key={index}>
+              <View style={styles.tableRow} key={item.id || index}>
                 <Text style={[styles.tableCell, styles.tableCellLast]}>
                   {index + 1}
                 </Text>

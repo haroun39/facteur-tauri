@@ -121,24 +121,27 @@ const styles = StyleSheet.create({
 });
 interface Props {
   data: {
-    invoices: Invoice[];
+    data: Invoice[];
     total: number;
   };
+  formDate: string;
+  toDate?: string;
 }
-export default function InvoicePDF({ data }: Props) {
+export default function InvoicePDF({ data, formDate, toDate }: Props) {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={{ ...styles.title, fontWeight: 700 }}>فواتير</Text>
+          <Text style={{ ...styles.title, fontWeight: 700 }}>
+            تقرير الفواتير
+          </Text>
           {/* <Text style={{ direction: "rtl", fontSize: 10, color: "#4a5565" }}>
             رقم الفاتورة: {invoice.invoice_number}
           </Text> */}
         </View>
-
         {/* Customer + Invoice Info */}
-        {/* <View
+        <View
           style={{
             flexDirection: "row-reverse",
             justifyContent: "space-between",
@@ -150,19 +153,25 @@ export default function InvoicePDF({ data }: Props) {
               direction: "rtl",
             }}
           >
-            <Text style={styles.sectionTitle}>معلومات العميل</Text>
+            <Text style={styles.sectionTitle}>معلومات الشركة</Text>
             <Text style={{ direction: "rtl", fontSize: 8 }}>
-              الاسم: {invoice.customer_name}
+              نظام الفواتير والديون
+            </Text>
+            <Text style={{ direction: "rtl", fontSize: 8 }}>
+              الهاتف: 1234567890
+            </Text>
+            <Text style={{ direction: "rtl", fontSize: 8 }}>
+              العنوان: شارع المثال، المدينة، البلد
             </Text>
           </View>
 
           <View style={{ width: "48%", direction: "rtl" }}>
             <Text style={styles.sectionTitle}>تفاصيل الفاتورة</Text>
             <Text style={{ direction: "rtl", fontSize: 8 }}>
-              التاريخ: {invoice.date}
+              التاريخ: {toDate ? `${formDate} إلى ${toDate}` : formDate}
             </Text>
           </View>
-        </View> */}
+        </View>
 
         {/* Items Table */}
         <View style={{ ...styles.section, marginTop: 16 }}>
@@ -170,7 +179,7 @@ export default function InvoicePDF({ data }: Props) {
 
           <View style={styles.table}>
             <View style={styles.tableRow}>
-              <Text
+              {/* <Text
                 style={[
                   styles.tableCellHeader,
                   styles.tableCellLast,
@@ -180,17 +189,17 @@ export default function InvoicePDF({ data }: Props) {
                     flexShrink: 0,
                   },
                 ]}
-              ></Text>
-              <Text style={[styles.tableCellHeader]}>#</Text>
+              ></Text> */}
               <Text style={styles.tableCellHeader}>اسم العميل</Text>
               <Text style={styles.tableCellHeader}>رقم الهاتف</Text>
-              <Text style={styles.tableCellHeader}>التاريخ</Text>
-              <Text style={[styles.tableCellHeader]}>الإجمالي</Text>
+              <Text style={styles.tableCellHeader}>العنوان</Text>
+              <Text style={[styles.tableCellHeader]}>قيمة الفاتورة</Text>
+              <Text style={styles.tableCellHeader}>التسديد</Text>
             </View>
 
-            {data.invoices.map((item, index) => (
+            {data.data.map((item, index) => (
               <View style={styles.tableRow} key={index}>
-                <Text
+                {/* <Text
                   style={[
                     styles.tableCell,
                     styles.tableCellLast,
@@ -200,12 +209,12 @@ export default function InvoicePDF({ data }: Props) {
                       flexShrink: 0,
                     },
                   ]}
-                ></Text>
-                <Text style={[styles.tableCell]}>{item?.invoice_number}</Text>
+                ></Text> */}
                 <Text style={styles.tableCell}>{item?.customer_name}</Text>
                 <Text style={styles.tableCell}>{item?.customer_phone}</Text>
-                <Text style={styles.tableCell}>{item?.date}</Text>
+                <Text style={styles.tableCell}>{item?.customer_address}</Text>
                 <Text style={[styles.tableCell]}>{item?.total.toFixed(2)}</Text>
+                <Text style={styles.tableCell}></Text>
               </View>
             ))}
           </View>

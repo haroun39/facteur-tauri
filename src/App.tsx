@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import CustomersPage from "./components/Customers/CustomersPage";
 import InvoicesPage from "./components/Invoices/InvoicesPage";
@@ -8,7 +8,9 @@ import ReportsPage from "./components/Reports/ReportsPage";
 type Page = "customers" | "invoices" | "payments" | "debts" | "reports";
 
 function App() {
-  const [currentPage, setCurrentPage] = useState<Page>("invoices");
+  const [currentPage, setCurrentPage] = useState<Page>(
+    (localStorage.getItem("lastVisitedPage") as Page) || "customers"
+  );
 
   const renderPage = () => {
     switch (currentPage) {
@@ -26,6 +28,9 @@ function App() {
         return <CustomersPage />;
     }
   };
+  useEffect(() => {
+    localStorage.setItem("lastVisitedPage", currentPage);
+  }, [currentPage]);
   return (
     <div className="flex h-screen bg-gray-100 flex-col">
       {/* Sidebar */}

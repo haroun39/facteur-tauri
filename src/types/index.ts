@@ -18,6 +18,7 @@ export interface Invoice {
   customer_id: number;
   customer_name?: string;
   customer_phone?: string;
+  customer_address?: string;
   date: string;
   total: number;
   status?: "paid" | "unpaid" | "partial";

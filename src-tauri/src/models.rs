@@ -40,6 +40,7 @@ pub struct InvoiceWithCustomer {
     pub customer_id: i32,
     pub customer_name: Option<String>,
     pub customer_phone: Option<String>,
+    pub customer_address: Option<String>,
     pub date: String,
     pub total: f64,
     pub status: Option<String>,

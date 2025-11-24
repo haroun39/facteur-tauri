@@ -131,6 +131,8 @@ export default function InvoicePDF({
   formDate,
   toDate,
 }: Props) {
+  // let totalInvoices = 0;
+  // let totalPayments = 0;
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -200,32 +202,36 @@ export default function InvoicePDF({
               <Text style={[styles.tableCellHeader]}>الإجمالي</Text>
             </View>
 
-            {data.data.map((item, index) => (
-              <View style={styles.tableRow} key={index}>
-                <Text
-                  style={[
-                    styles.tableCell,
-                    styles.tableCellLast,
-                    {
-                      paddingHorizontal: 10,
-                      flexGrow: 0,
-                      flexShrink: 0,
-                    },
-                  ]}
-                ></Text>
-                <Text style={[styles.tableCell]}>{item?.reference || "-"}</Text>
-                {/* <Text style={styles.tableCell}>{item?.customer_name}</Text>
+            {data.data.map((item, index) => {
+              return (
+                <View style={styles.tableRow} key={item.reference || index}>
+                  <Text
+                    style={[
+                      styles.tableCell,
+                      styles.tableCellLast,
+                      {
+                        paddingHorizontal: 10,
+                        flexGrow: 0,
+                        flexShrink: 0,
+                      },
+                    ]}
+                  ></Text>
+                  <Text style={[styles.tableCell]}>
+                    {item?.reference ?? "-"}
+                  </Text>
+                  {/* <Text style={styles.tableCell}>{item?.customer_name}</Text>
                 <Text style={styles.tableCell}>{item?.customer_phone}</Text> */}
-                <Text style={styles.tableCell}>{item?.date}</Text>
-                <Text style={styles.tableCell}>
-                  {item?.transaction_type == "payment" ? "دفعة" : "فاتورة"}
-                </Text>
+                  <Text style={styles.tableCell}>{item?.date ?? "-"}</Text>
+                  <Text style={styles.tableCell}>
+                    {item.transaction_type === "invoice" ? "فاتورة" : "دفعة"}
+                  </Text>
 
-                <Text style={[styles.tableCell]}>
-                  {item?.amount.toFixed(2)}
-                </Text>
-              </View>
-            ))}
+                  <Text style={[styles.tableCell]}>
+                    {(item.amount ?? 0).toFixed(2)}
+                  </Text>
+                </View>
+              );
+            })}
           </View>
         </View>
 

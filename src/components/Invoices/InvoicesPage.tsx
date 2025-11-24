@@ -28,10 +28,7 @@ const InvoicesPage: React.FC = () => {
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [printData, setPrintData] = useState<{
-    invoices: Invoice[];
-    total: number;
-  } | null>(null);
+
   const [isOpenPrint, setIsOpenPrint] = useState(false);
 
   useEffect(() => {
@@ -129,8 +126,6 @@ const InvoicesPage: React.FC = () => {
   };
 
   const onPrint = async () => {
-    const { data, total } = await getAllInvoices(searchTerm.trim() || undefined);
-    setPrintData({ invoices: data, total });
     setIsOpenPrint(true);
   };
 
@@ -181,11 +176,8 @@ const InvoicesPage: React.FC = () => {
         totalInvoices={totalInvoices}
         onPrint={onPrint}
       />
-      {isOpenPrint && printData && (
-        <InvoicesPrint
-          data={printData}
-          onClose={() => setIsOpenPrint(false)}
-        />
+      {isOpenPrint && (
+        <InvoicesPrint open={isOpenPrint} onOpenChange={setIsOpenPrint} />
       )}
     </div>
   );

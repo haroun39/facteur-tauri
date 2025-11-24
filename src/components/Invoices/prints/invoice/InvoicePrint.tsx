@@ -11,7 +11,7 @@ interface Props {
 
 const InvoicePrint: React.FC<Props> = ({ invoice, onClose }) => {
   const [items, setItems] = useState<InvoiceItem[]>([]);
-
+  // D:\otherproject\facteur_tauri\tauri-app\src-tauri\invoices\invoices_report.pdf
   useEffect(() => {
     const loadItems = async () => {
       if (invoice.id) {
@@ -40,6 +40,7 @@ const InvoicePrint: React.FC<Props> = ({ invoice, onClose }) => {
           <PDFViewer
             width={"100%"}
             style={{ height: "calc(90vh - 5rem)", border: "none" }}
+            key={Math.random()}
           >
             <InvoicePDF invoice={invoice} items={items} />
           </PDFViewer>

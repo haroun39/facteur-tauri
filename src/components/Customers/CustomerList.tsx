@@ -11,6 +11,7 @@ import {
 } from "../ui/table";
 // @ts-ignore: SVG module missing types
 import emptyData from "../../assets/emptyData-light.svg";
+import { Pencil, PrinterIcon, Trash } from "lucide-react";
 interface Props {
   customers: Customer[];
   onEdit: (customer: Customer) => void;
@@ -75,18 +76,27 @@ const CustomerList: React.FC<Props> = ({
                         className="text-primary hover:text-blue-700 bg-gray-100 p-2 px-3 rounded-md"
                       >
                         تعديل
+                        <Pencil
+                          className="inline-block w-4 h-4 ms-1"
+                          size={16}
+                        />
                       </button>
                       <button
                         onClick={() => customer.id && onDelete(customer.id)}
                         className="text-danger hover:text-red-700 bg-gray-100 p-2 px-3 rounded-md"
                       >
                         حذف
+                        <Trash
+                          className="inline-block w-4 h-4 ms-1"
+                          size={16}
+                        />
                       </button>
                       <button
                         onClick={() => onPrint(customer)}
                         className="text-secondary hover:text-green-700 bg-gray-100 p-2 px-3 rounded-md"
                       >
                         طباعة المعاملات
+                        <PrinterIcon className="inline-block w-4 h-4 ms-1" />
                       </button>
                     </div>
                   </TableCell>

@@ -42,7 +42,7 @@ pub fn get_all_invoices(
 
     // 2) Paginated query
     let mut sql = format!(
-        "SELECT i.id, i.invoice_number, i.customer_id, i.date, i.total, i.status, i.paid_amount, i.created_at, c.name as customer_name, c.phone as customer_phone
+        "SELECT i.id, i.invoice_number, i.customer_id, i.date, i.total, i.status, i.paid_amount, i.created_at, c.name as customer_name, c.phone as customer_phone, c.address as customer_address
          FROM invoices i
          LEFT JOIN customers c ON i.customer_id = c.id
          {}
@@ -75,6 +75,7 @@ pub fn get_all_invoices(
                         paid_amount: row.get::<_, Option<f64>>(6)?,
                         remaining_amount: None,
                         created_at: row.get::<_, Option<String>>(7)?,
+                        customer_address: row.get::<_, Option<String>>(10)?,
                     })
                 })
                 .map_err(|e| e.to_string())?;
@@ -101,6 +102,7 @@ pub fn get_all_invoices(
                         paid_amount: row.get::<_, Option<f64>>(6)?,
                         remaining_amount: None,
                         created_at: row.get::<_, Option<String>>(7)?,
+                        customer_address: row.get::<_, Option<String>>(10)?,
                     })
                 })
                 .map_err(|e| e.to_string())?;
@@ -132,6 +134,7 @@ pub fn get_all_invoices(
                         paid_amount: row.get::<_, Option<f64>>(6)?,
                         remaining_amount: None,
                         created_at: row.get::<_, Option<String>>(7)?,
+                        customer_address: row.get::<_, Option<String>>(10)?,
                     })
                 })
                 .map_err(|e| e.to_string())?;
@@ -157,6 +160,7 @@ pub fn get_all_invoices(
                         paid_amount: row.get::<_, Option<f64>>(6)?,
                         remaining_amount: None,
                         created_at: row.get::<_, Option<String>>(7)?,
+                        customer_address: row.get::<_, Option<String>>(10)?,
                     })
                 })
                 .map_err(|e| e.to_string())?;
@@ -474,4 +478,144 @@ pub fn delete_invoice(id: i32) -> Result<(), String> {
         .map_err(|e| e.to_string())?;
 
     Ok(())
+}
+
+#[tauri::command]
+pub fn get_invoices(
+    from_date: String,
+    to_date: Option<String>,
+    customer_id: Option<i32>, // ← إضافة هذا
+) -> Result<InvoicesResponse, String> {
+    let conn = get_db().map_err(|e| e.to_string())?;
+
+    let end_date = to_date.clone().unwrap_or_else(|| "9999-12-31".to_string());
+
+    // قاعدة التاريخ
+    let mut conditions = String::new();
+
+    if to_date.is_some() {
+        conditions.push_str("i.date BETWEEN ?1 AND ?2");
+    } else {
+        conditions.push_str("i.date >= ?1");
+    }
+
+    // قاعدة العميل (اختيارية)
+    if customer_id.is_some() {
+        conditions.push_str(" AND i.customer_id = ?3");
+    }
+
+    // SQL النهائي
+    let sql = format!(
+        r#"
+        SELECT 
+          i.id,
+          i.invoice_number,
+          i.customer_id,
+          i.date,
+          i.total,
+          i.status,
+          i.paid_amount,
+          i.created_at,
+          c.name AS customer_name,
+          c.phone AS customer_phone,
+          c.address AS customer_address
+        FROM invoices i
+        LEFT JOIN customers c ON i.customer_id = c.id
+        WHERE {}
+        ORDER BY i.date ASC
+        "#,
+        conditions
+    );
+
+    let mut stmt = conn.prepare(&sql).map_err(|e| e.to_string())?;
+
+    // Build params for query
+    let mut params: Vec<Box<dyn rusqlite::ToSql>> = Vec::new();
+    params.push(Box::new(from_date.clone()));
+    if to_date.is_some() {
+        params.push(Box::new(end_date.clone()));
+    }
+    if let Some(cid) = customer_id {
+        params.push(Box::new(cid));
+    }
+    let params_refs: Vec<&dyn rusqlite::ToSql> = params
+        .iter()
+        .map(|b| &**b as &dyn rusqlite::ToSql)
+        .collect();
+
+    let invoices = stmt
+        .query_map(params_refs.as_slice(), |row| {
+            Ok(InvoiceWithCustomer {
+                id: row.get(0)?,
+                invoice_number: row.get(1)?,
+                customer_id: row.get::<_, i32>(2)?,
+                customer_name: row.get::<_, Option<String>>(8)?,
+                customer_phone: row.get::<_, Option<String>>(9)?,
+                date: row.get(3)?,
+                total: row.get(4)?,
+                status: row.get::<_, Option<String>>(5)?,
+                paid_amount: row.get::<_, Option<f64>>(6)?,
+                remaining_amount: None,
+                created_at: row.get::<_, Option<String>>(7)?,
+                customer_address: row.get::<_, Option<String>>(10)?,
+            })
+        })
+        .map_err(|e| e.to_string())?
+        .filter_map(|x| x.ok())
+        .collect::<Vec<_>>();
+
+    // ملخص (بدون تغيير)
+    let summary_sql = if to_date.is_some() {
+        if customer_id.is_some() {
+            r#"
+            SELECT IFNULL(SUM(total), 0)
+            FROM invoices
+            WHERE date BETWEEN ?1 AND ?2 AND customer_id = ?3
+            "#
+        } else {
+            r#"
+            SELECT IFNULL(SUM(total), 0)
+            FROM invoices
+            WHERE date BETWEEN ?1 AND ?2
+            "#
+        }
+    } else {
+        if customer_id.is_some() {
+            r#"
+            SELECT IFNULL(SUM(total), 0)
+            FROM invoices
+            WHERE date >= ?1 AND customer_id = ?2
+            "#
+        } else {
+            r#"
+            SELECT IFNULL(SUM(total), 0)
+            FROM invoices
+            WHERE date >= ?1
+            "#
+        }
+    };
+
+    let mut total_params: Vec<Box<dyn rusqlite::ToSql>> = Vec::new();
+    total_params.push(Box::new(from_date.clone()));
+    if to_date.is_some() {
+        total_params.push(Box::new(end_date.clone()));
+    }
+    if let Some(cid) = customer_id {
+        total_params.push(Box::new(cid));
+    }
+    let total_params_refs: Vec<&dyn rusqlite::ToSql> = total_params
+        .iter()
+        .map(|b| &**b as &dyn rusqlite::ToSql)
+        .collect();
+
+    let total_invoices: f64 = conn
+        .query_row(summary_sql, total_params_refs.as_slice(), |row| {
+            Ok(row.get(0)?)
+        })
+        .unwrap_or(0.0);
+
+    Ok(InvoicesResponse {
+        data: invoices,
+        total: total_invoices,
+    })
 }

@@ -65,6 +65,13 @@ export const deleteInvoice = async (id: number) => {
   return await invoke("delete_invoice", { id });
 };
 
+export const getInvoices = async (
+  fromDate: string,
+  toDate?: string
+): Promise<string> => {
+  return await invoke("generate_invoices_pdf", { fromDate, toDate });
+};
+
 // ================== INVOICE ITEMS ==================
 
 export const getInvoiceItems = async (

@@ -12,7 +12,7 @@ import {
 import emptyData from "../../assets/emptyData-light.svg";
 import Pagination from "../global/Pagination";
 import InvoicePrint from "./prints/invoice/InvoicePrint";
-import { PrinterIcon } from "lucide-react";
+import { Pencil, PrinterIcon, Trash } from "lucide-react";
 interface Props {
   invoices: Invoice[];
   onEdit: (invoice: Invoice) => void;
@@ -107,18 +107,30 @@ const InvoiceList: React.FC<Props> = ({
                         className="text-primary hover:text-blue-700 bg-gray-100 p-2 px-3 rounded-md"
                       >
                         تعديل
+                        <Pencil
+                          className="inline-block w-4 h-4 ms-1"
+                          size={16}
+                        />
                       </button>
                       <button
                         onClick={() => invoice.id && onDelete(invoice.id)}
                         className="text-danger hover:text-red-700 bg-gray-100 p-2 px-3 rounded-md"
                       >
                         حذف
+                        <Trash
+                          className="inline-block w-4 h-4 ms-1"
+                          size={16}
+                        />
                       </button>
                       <button
                         onClick={() => setPrintInvoice(invoice)}
                         className="text-secondary hover:text-green-700 bg-gray-100 p-2 px-3 rounded-md"
                       >
                         طباعة
+                        <PrinterIcon
+                          className="inline-block w-4 h-4 ms-1"
+                          size={16}
+                        />
                       </button>
                     </div>
                   </TableCell>

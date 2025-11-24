@@ -6,3 +6,5 @@ pub use customers::*;
 pub use debts::*;
 pub use invoices::*;
 pub use payments::*;
+pub mod prints;
+pub use prints::*;

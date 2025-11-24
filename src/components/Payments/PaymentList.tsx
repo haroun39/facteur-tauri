@@ -11,6 +11,7 @@ import {
 // @ts-ignore: SVG module missing types
 import emptyData from "../../assets/emptyData-light.svg";
 import Pagination from "../global/Pagination";
+import { Pencil, Trash } from "lucide-react";
 interface Props {
   payments: Payment[];
   onEdit: (payment: Payment) => void;
@@ -87,12 +88,14 @@ const PaymentList: React.FC<Props> = ({
                       className="text-primary hover:text-blue-700 ml-3 bg-gray-100 p-2 px-3 rounded-md"
                     >
                       تعديل
+                      <Pencil className="inline-block w-4 h-4 ms-1" size={16} />
                     </button>
                     <button
                       onClick={() => payment.id && onDelete(payment.id)}
                       className="text-danger hover:text-red-700 bg-gray-100 p-2 px-3 rounded-md"
                     >
                       حذف
+                      <Trash className="inline-block w-4 h-4 ms-1" size={16} />
                     </button>
                   </TableCell>
                 </TableRow>

@@ -1,41 +1,136 @@
-import { Invoice } from "../../../../types";
-import { PDFViewer } from "@react-pdf/renderer";
-import InvoicePDF from "./InvoicePDF";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useState } from "react";
+import { getInvoices } from "@/main";
+import { cn } from "@/lib/utils";
+import { Printer } from "lucide-react";
+import { openPath } from "@tauri-apps/plugin-opener";
+import { Spinner } from "@/components/ui/spinner";
 
-interface Props {
-  data: {
-    invoices: Invoice[];
-    total: number;
+type Props = {
+  open: boolean;
+  onOpenChange: React.Dispatch<React.SetStateAction<boolean>>;
+};
+const InvoicesPrint: React.FC<Props> = (props) => {
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState<{
+    from: string;
+    to: string;
+    customer_id: number;
+  }>({
+    from: "",
+    to: "",
+    customer_id: 0,
+  });
+  // const [searchTerm, setSearchTerm] = useState("");
+
+  // const loadCustomers = async (searchQuery?: string) => {
+  //   const data = await getAllCustomers(searchQuery);
+  //   return data;
+  // };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
-  onClose: () => void;
-}
 
-const InvoicesPrint: React.FC<Props> = ({ data, onClose }) => {
-
+  const handlePrint = async () => {
+    setLoading(true);
+    // Implement print logic here, possibly invoking a backend command
+    const data = await getInvoices(formData.from, formData.to || undefined);
+    // فتح الملف مع البرنامج الافتراضي (ويمكن من هناك طباعته)
+    await openPath(data);
+    props.onOpenChange(false);
+    setLoading(false);
+  };
   return (
-    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 print:bg-white print:block print:p-0">
-      <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh]  overflow-auto print:max-w-none print:max-h-none print:overflow-visible print:rounded-none">
-        <div>
-          {/* أزرار التحكم */}
-          <div className="sticky top-0 bg-white border-b p-4 flex justify-between items-center print:hidden">
-            <h2 className="text-xl font-bold">طباعة الفاتورة</h2>
-            <div className="flex gap-2">
-              <button onClick={onClose} className="btn-outline">
-                إغلاق
-              </button>
-            </div>
+    <Dialog open={props.open} onOpenChange={props.onOpenChange}>
+      <DialogContent
+        onOpenChange={props.onOpenChange}
+        className={cn("max-w-lg")}
+      >
+        <DialogTitle>
+          <h2 className="text-lg font-bold mb-4">طباعة الفواتير</h2>
+        </DialogTitle>
+
+        <div className="grid grid-cols-1 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              من تاريخ *
+            </label>
+            <input
+              type="date"
+              name="from"
+              value={formData.from}
+              onChange={handleChange}
+              required
+              className="input-field"
+            />
           </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              إلى تاريخ *
+            </label>
+            <input
+              type="date"
+              name="to"
+              value={formData.to}
+              onChange={handleChange}
+              required
+              min={formData.from}
+              className="input-field"
+            />
+          </div>
+          {/* <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                العميل *
+              </label>
+              <InputSearch3
+                idValue={formData.customer_id}
+                onValueChange={(value) => {
+                  setFormData({ ...formData, customer_id: value });
+                }}
+                loadOptions={loadCustomers}
+                className="input-field"
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+                placeholder="ابحث عن عميل..."
+                type="text"
+                required
+                id="customer_id"
+              />
+            </div> */}
         </div>
-        {data.invoices.length > 0 && (
-          <PDFViewer
-            width={"100%"}
-            style={{ height: "calc(90vh - 5rem)", border: "none" }}
+        <DialogFooter className="flex items-center gap-2">
+          <button
+            className="btn-primary flex items-center gap-3"
+            id="modal-print-btn"
+            onClick={handlePrint}
+            disabled={loading}
           >
-            <InvoicePDF data={data}/>
-          </PDFViewer>
-        )}
-      </div>
-    </div>
+            طباعة
+            {loading ? (
+              <Spinner className="w-4 h-4 " />
+            ) : (
+              <Printer className="w-4 h-4 " />
+            )}
+          </button>
+          <button
+            className="btn-outline"
+            id="modal-cancel-btn"
+            onClick={() => props.onOpenChange(false)}
+          >
+            إلغاء
+          </button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 
