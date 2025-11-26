@@ -6,7 +6,6 @@ import {
   Payment,
   Product,
   ReportSummary,
-  TransactionsReport,
 } from "./types";
 
 // ================== CUSTOMERS ==================
@@ -143,10 +142,20 @@ export const getCustomerDebt = async (customerId: number) => {
 
 export const getTransactions = async (
   customerId: number,
+  customerName: string,
+  customerPhone: string,
+  customerAddress: string,
   fromDate: string,
   toDate?: string
-): Promise<TransactionsReport> => {
-  return await invoke("get_transactions", { customerId, fromDate, toDate });
+): Promise<string> => {
+  return await invoke("generate_transactions_pdf", {
+    customerId,
+    customerName,
+    customerPhone,
+    customerAddress,
+    fromDate,
+    toDate,
+  });
 };
 
 // ================== REPORTS ==================

@@ -43,6 +43,7 @@ pub fn run() {
             get_report_summary,
             get_transactions,
             generate_invoices_pdf,
+            generate_transactions_pdf
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

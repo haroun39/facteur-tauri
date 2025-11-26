@@ -44,6 +44,8 @@ const InvoicesPrint: React.FC<Props> = (props) => {
     // Implement print logic here, possibly invoking a backend command
     const data = await getInvoices(formData.from, formData.to || undefined);
     // فتح الملف مع البرنامج الافتراضي (ويمكن من هناك طباعته)
+    // const path =
+    //   "C:/Users/haroun_dev/AppData/Roaming/com.haroundev.facteur/invoices/invoices_report.pdf";
     await openPath(data);
     props.onOpenChange(false);
     setLoading(false);
