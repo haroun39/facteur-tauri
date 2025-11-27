@@ -89,7 +89,7 @@ function PrintDialog(props: Props) {
         </div>
         <DialogFooter className="flex items-center gap-2">
           <button
-            className="btn-primary"
+            className="btn-primary flex items-center gap-2"
             id="modal-print-btn"
             onClick={handlePrint}
             disabled={loading}

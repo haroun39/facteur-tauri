@@ -16,7 +16,7 @@
 #let total_payments = "{total_payments}"
 #let remaining_total = "{remaining_total}"
 #let rows = (
-  { rows }
+  {rows}
 )
 
 #let header(company, phone, address) = block[
